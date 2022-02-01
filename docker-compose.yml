@@ -116,16 +116,16 @@ services:
      - "/media/multimedia/torrents:/downloads"
    restart: unless-stopped
 
-  prowlarr:
-   image: lscr.io/linuxserver/prowlarr
-   container_name: prowlarr
-   environment:
-     - VIRTUAL_HOST=prowlarr.local.io
-     - VIRTUAL_PORT=9696
-   volumes:
-     - "./prowlarr/config/:/config"
-     - "/media/multimedia/torrents:/downloads"
-   restart: unless-stopped
+   #prowlarr:
+   # image: lscr.io/linuxserver/prowlarr
+   # container_name: prowlarr
+   # environment:
+   #   - VIRTUAL_HOST=prowlarr.local.io
+   #   - VIRTUAL_PORT=9696
+   # volumes:
+   #   - "./prowlarr/config/:/config"
+   #   - "/media/multimedia/torrents:/downloads"
+   # restart: unless-stopped
 
   flaresolverr:
    image: ghcr.io/flaresolverr/flaresolverr:latest
@@ -214,7 +214,7 @@ services:
      - VIRTUAL_HOST=radarr.local.io
      - VIRTUAL_PORT=7878
    volumes:
-     - "./radarr/config/:/config"
+     - "./media/multimedia/radarr/config/:/config"
      - "/media/multimedia/movies/:/movies"
      - "/media/multimedia/:/downloads"
    restart: unless-stopped
@@ -226,7 +226,7 @@ services:
      - VIRTUAL_HOST=sonarr.local.io
      - VIRTUAL_PORT=8989
    volumes:
-     - "./sonarr/config/:/config"
+     - "./media/multimedia/sonarr/config/:/config"
      - "/media/multimedia/tv_shows/:/tv_shows"
      - "/media/multimedia/:/downloads"
    restart: unless-stopped

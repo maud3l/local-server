@@ -1,7 +1,3 @@
-calibre/
-sonarr/
-radarr/
-ombi/
-pyload/
-wireguard/
-embystat/
+calibre
+pyload
+

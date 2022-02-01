@@ -130,6 +130,8 @@ services:
   flaresolverr:
    image: ghcr.io/flaresolverr/flaresolverr:latest
    container_name: flaresolverr
+   depends_on:
+     - jackett
    environment:
     - VIRTUAL_HOST=flaresolverr.local.io
     - VIRTUAL_PORT=8191

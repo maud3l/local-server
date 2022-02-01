@@ -2710,3 +2710,30 @@
 2022-02-01 14:28:07.458 +00:00 [Debug] Batch acquisition of 0 triggers
 2022-02-01 14:28:32.769 +00:00 [Debug] Batch acquisition of 0 triggers
 2022-02-01 14:29:01.185 +00:00 [Debug] Batch acquisition of 0 triggers
+2022-02-01 14:29:28.268 +00:00 [Debug] Batch acquisition of 0 triggers
+2022-02-01 14:29:55.856 +00:00 [Debug] Batch acquisition of 1 triggers
+2022-02-01 14:30:00.000 +00:00 [Debug] Batch acquisition of 1 triggers
+2022-02-01 14:30:00.000 +00:00 [Debug] Calling Execute on job DVR.ICouchPotatoSync
+2022-02-01 14:30:00.001 +00:00 [Debug] Batch acquisition of 1 triggers
+2022-02-01 14:30:00.007 +00:00 [Debug] Batch acquisition of 0 triggers
+2022-02-01 14:30:00.008 +00:00 [Debug] Calling Execute on job Emby.IEmbyContentSyncRecentlyAdded
+2022-02-01 14:30:00.011 +00:00 [Debug] Trigger instruction : NoInstruction
+2022-02-01 14:30:00.019 +00:00 [Debug] Calling Execute on job Plex.IPlexContentSyncRecentlyAdded
+2022-02-01 14:30:00.023 +00:00 [Debug] Trigger instruction : NoInstruction
+2022-02-01 14:30:00.079 +00:00 [Debug] Batch acquisition of 1 triggers
+2022-02-01 14:30:00.079 +00:00 [Debug] Trigger instruction : NoInstruction
+2022-02-01 14:30:00.079 +00:00 [Debug] Batch acquisition of 0 triggers
+2022-02-01 14:30:00.080 +00:00 [Debug] Calling Execute on job Emby.IEmbyEpisodeSync
+2022-02-01 14:30:00.125 +00:00 [Debug] Trigger instruction : DeleteTrigger
+2022-02-01 14:30:00.125 +00:00 [Debug] Batch acquisition of 1 triggers
+2022-02-01 14:30:00.125 +00:00 [Debug] Deleting trigger
+2022-02-01 14:30:00.125 +00:00 [Debug] Batch acquisition of 0 triggers
+2022-02-01 14:30:00.125 +00:00 [Debug] Calling Execute on job System.IRefreshMetadata
+2022-02-01 14:30:00.500 +00:00 [Debug] Batch acquisition of 1 triggers
+2022-02-01 14:30:00.501 +00:00 [Debug] Batch acquisition of 0 triggers
+2022-02-01 14:30:00.501 +00:00 [Debug] Trigger instruction : DeleteTrigger
+2022-02-01 14:30:00.501 +00:00 [Debug] Calling Execute on job Emby.IEmbyAvaliabilityChecker
+2022-02-01 14:30:00.501 +00:00 [Debug] Deleting trigger
+2022-02-01 14:30:00.527 +00:00 [Debug] Trigger instruction : DeleteTrigger
+2022-02-01 14:30:00.527 +00:00 [Debug] Deleting trigger
+2022-02-01 14:30:28.293 +00:00 [Debug] Batch acquisition of 0 triggers

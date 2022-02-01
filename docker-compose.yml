@@ -214,7 +214,7 @@ services:
      - VIRTUAL_HOST=radarr.local.io
      - VIRTUAL_PORT=7878
    volumes:
-     - "./media/multimedia/radarr/config/:/config"
+     - "/media/multimedia/radarr/config/:/config"
      - "/media/multimedia/movies/:/movies"
      - "/media/multimedia/:/downloads"
    restart: unless-stopped
@@ -226,7 +226,7 @@ services:
      - VIRTUAL_HOST=sonarr.local.io
      - VIRTUAL_PORT=8989
    volumes:
-     - "./media/multimedia/sonarr/config/:/config"
+     - "/media/multimedia/sonarr/config/:/config"
      - "/media/multimedia/tv_shows/:/tv_shows"
      - "/media/multimedia/:/downloads"
    restart: unless-stopped

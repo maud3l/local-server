@@ -1,267 +1,108 @@
 version: "3.7"
 services:
-
-  blocky:
-   image: spx01/blocky
-   container_name: blocky
-   restart: unless-stopped
-   ports:
-    - "53:53/tcp"
-    - "53:53/udp"
-   environment:
-     - VIRTUAL_HOST=blocky.local.io
-     - VIRTUAL_PORT=4000
-   volumes:
-     - ./blocky/config.yml:/app/config.yml
-
-  prometheus:
-   image: prom/prometheus
-   container_name: prometheus
-   environment:
-     - VIRTUAL_HOST=prometheus.local.io
-     - VIRTUAL_PORT=9090
-   volumes:
-     - "./prometheus/:/etc/prometheus/"
-     - "prometheus_data:/prometheus"
-   command:
-     - '--config.file=/etc/prometheus/prometheus.yml'
-     - '--storage.tsdb.path=/prometheus'
-     - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-     - '--web.console.templates=/usr/share/prometheus/consoles'
-   restart: always
-   links:
-     - cadvisor:cadvisor
-     - node-exporter:node-exporter
-
-  node-exporter:
-    image: prom/node-exporter:latest
-    container_name: node-exporter
-    restart: unless-stopped
-    environment:
-      - VIRTUAL_HOST=node-exporter.loca.io
-      - VIRTUAL_PORT=9100
-
-  cadvisor:
-    image: google/cadvisor:latest
-    container_name: cadvisor
-    restart: unless-stopped
-    volumes:
-      - "/:/rootfs:ro"
-      - "/var/run:/var/run:rw"
-      - "/sys:/sys:ro"
-      - "/var/lib/docker/:/var/lib/docker:ro"
-    environment:
-      - VIRTUAL_HOST=cadvisor.local.io
-      - VIRTUAL_PORT=8080
-
-  grafana:
-   image: grafana/grafana:6.7.1
-   container_name: grafana
-   depends_on:
-     - prometheus
-   volumes:
-     - grafana_data:/var/lib/grafana
-     - ./grafana/provisioning/:/etc/grafana/provisioning/
-   environment:
-     - VIRTUAL_HOST=grafana.local.io
-     - VIRTUAL_PORT=3000
-     - GF_PANELS_DISABLE_SANITIZE_HTML=true
-     - GF_INSTALL_PLUGINS=grafana-piechart-panel
-   restart: always
-
-  nginx-proxy:
-   image: nginxproxy/nginx-proxy
-   container_name: nginx-proxy
-   restart: unless-stopped
-   ports:
-    - "80:80"
-   volumes:
-     - /var/run/docker.sock:/tmp/docker.sock:ro
-
   emby-server:
-   image: emby/embyserver
-   container_name: emby-server
-   restart: unless-stopped
-   environment:
-     - VIRTUAL_HOST=emby.local.io
-     - VIRTUAL_PORT=8096
-   volumes:
-     - "/media/multimedia/tv_shows/:/tv_shows"
-     - "/media/multimedia/music/:/music"
-     - "/media/multimedia/movies/:/movies"
+    image: emby/embyserver
+    container_name: emby-server
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+    volumes:
+      - "/home/mau/multimedia/ext/tv_shows/:/tv_shows"
+      - "/home/mau/multimedia/ext/movies/:/movies"
+    ports:
+      - 8096:8096 # HTTP port
+      - 8920:8920 # HTTPS port
 
-  deluge:
-   image: lscr.io/linuxserver/deluge
-   container_name: deluge
-   restart: unless-stopped
-   environment:
-     - VIRTUAL_HOST=deluge.local.io
-     - VIRTUAL_PORT=8112
-   volumes:
-     - "/home/mauro/.config/deluge/:/config"
-     - "/media/multimedia/:/downloads"
-     - "/media/multimedia/torrents:/torrents"
-     - "/media/multimedia/tv_shows/:/tv_shows"
-     - "/media/multimedia/movies/:/movies"
-     - "/media/multimedia/music/:/music"
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+      - WEBUI_PORT=8080
+    volumes:
+      - "/home/mau/multimedia/ext/tv_shows/:/tv_shows"
+      - "/home/mau/multimedia/ext/movies/:/movies"
+      - "/home/mau/multimedia/ext:/downloads"
+      - "/home/mau/.config/qbittorrent/:/config"
+      - "/home/mau/multimedia/ext/torrents:/torrents"
+    ports:
+      - 8080:8080
+      - 6881:6881
+      - 6881:6881/udp
+    restart: unless-stopped
 
-  jackett:
-   image: lscr.io/linuxserver/jackett
-   container_name: jackett
-   environment:
-     - VIRTUAL_HOST=jackett.local.io
-     - VIRTUAL_PORT=9117
-   volumes:
-     - "./jackett/config/:/config"
-     - "/media/multimedia/torrents:/downloads"
-   restart: unless-stopped
-
-   #prowlarr:
-   # image: lscr.io/linuxserver/prowlarr
-   # container_name: prowlarr
-   # environment:
-   #   - VIRTUAL_HOST=prowlarr.local.io
-   #   - VIRTUAL_PORT=9696
-   # volumes:
-   #   - "./prowlarr/config/:/config"
-   #   - "/media/multimedia/torrents:/downloads"
-   # restart: unless-stopped
-
-  flaresolverr:
-   image: ghcr.io/flaresolverr/flaresolverr:latest
-   container_name: flaresolverr
-   depends_on:
-     - jackett
-   environment:
-    - VIRTUAL_HOST=flaresolverr.local.io
-    - VIRTUAL_PORT=8191
-   restart: unless-stopped
-
-  ombi:
-   image: lscr.io/linuxserver/ombi
-   container_name: ombi
-   environment:
-     - VIRTUAL_HOST=ombi.local.io
-     - VIRTUAL_PORT=3579
-   volumes:
-     - "./ombi/config:/config"
-
-  pyload:
-   image: lscr.io/linuxserver/pyload
-   container_name: pyload
-   environment:
-     - VIRTUAL_HOST=pyload.local.io
-     - VIRTUAL_PORT=8000
-   restart: unless-stopped
-   volumes:
-     - "./pyload/config:/config"
-     - "/media/multimedia/pyload/:/downloads"
-
-  filerundb:
-   image: mariadb:10.1
-   container_name: mariadb_filerun
-   environment:
-     - MYSQL_ROOT_PASSWORD=password
-     - MYSQL_USER=admin
-     - MYSQL_PASSWORD=password
-     - MYSQL_DATABASE=filerun_database
-   volumes:
-     - "/filerun/db:/var/lib/mysql"
-
-  filerun:
-   image: filerun/filerun
-   container_name: filerun
-   environment:
-     - FR_DB_HOST=filerundb
-     - FR_DB_PORT=3306
-     - FR_DB_NAME=filerun_database
-     - FR_DB_USER=admin
-     - FR_DB_PASS=password
-     - VIRTUAL_HOST=filerun.local.io
-   depends_on:
-     - filerundb
-   links:
-     - filerundb:filerundb
-   volumes:
-     - "/filerun/html:/var/www/html"
-     - "/filerun/user-files:/user-files"
-
-  embystat:
-   image: lscr.io/linuxserver/embystat
-   container_name: embystat
-   environment:
-     - VIRTUAL_HOST=embystat.local.io
-     - VIRTUAL_PORT=6555
-   volumes:
-     - "./embystat/config/:/config"
-   restart: unless-stopped
-
-  bazarr:
-   image: lscr.io/linuxserver/bazarr
-   container_name: bazarr
-   environment:
-     - VIRTUAL_HOST=bazarr.local.io
-     - VIRTUAL_PORT=6767
-   volumes:
-     - "./bazarr/config/:/config"
-     - "/media/multimedia/tv_shows/:/tv_shows"
-     - "/media/multimedia/music/:/music"
-     - "/media/multimedia/movies/:/movies"
-   restart: unless-stopped
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+    volumes:
+      - "/home/mau/multimedia/ext/config/prowlarr/config/:/config"
+      - "/home/mau/multimedia/ext:/downloads"
+    ports:
+      - 9696:9696
+    restart: unless-stopped
 
   radarr:
-   image: lscr.io/linuxserver/radarr
-   container_name: radarr
-   environment:
-     - VIRTUAL_HOST=radarr.local.io
-     - VIRTUAL_PORT=7878
-   volumes:
-     - "/media/multimedia/radarr/config/:/config"
-     - "/media/multimedia/movies/:/movies"
-     - "/media/multimedia/:/downloads"
-   restart: unless-stopped
+    image: lscr.io/linuxserver/radarr:nightly
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+    volumes:
+      - "/home/mau/multimedia/ext/config/radarr/config/:/config"
+      - "/home/mau/multimedia/ext/movies/:/movies"
+      - "/home/mau/multimedia/ext:/downloads"
+    ports:
+      - 7878:7878
+    restart: unless-stopped
 
   sonarr:
-   image: lscr.io/linuxserver/sonarr
-   container_name: sonarr
-   environment:
-     - VIRTUAL_HOST=sonarr.local.io
-     - VIRTUAL_PORT=8989
-   volumes:
-     - "/media/multimedia/sonarr/config/:/config"
-     - "/media/multimedia/tv_shows/:/tv_shows"
-     - "/media/multimedia/:/downloads"
-   restart: unless-stopped
-
-  calibre:
-    image: lscr.io/linuxserver/calibre
-    container_name: calibre
+    image: lscr.io/linuxserver/sonarr
+    container_name: sonarr
     environment:
-      - VIRTUAL_HOST=calibre.local.io
-      - VIRTUAL_PORT=8080
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
     volumes:
-      - "./calibre/config/:/config"
-      - "/media/multimedia/books/:/books"
+      - "/home/mau/multimedia/ext/config/sonarr/config/:/config"
+      - "/home/mau/multimedia/ext/tv_shows/:/tv_shows"
+      - "/home/mau/multimedia/ext:/downloads"
+    ports:
+      - 8989:8989
+    restart: unless-stopped
 
-  wireguard:
-   image: weejewel/wg-easy
-   container_name: wireguard
-   environment:
-     - VIRTUAL_HOST=wireguard.local.io
-     - VIRTUAL_PORT=51821
-     - PEERS=5
-   volumes:
-     - "./wireguard/config:/config"
-     - "/lib/modules:/lib/modules"
-   cap_add:
-     - NET_ADMIN
-     - SYS_MODULE
-   ports:
-     - "51820:51820/udp"
-   sysctls:
-     - net.ipv4.conf.all.src_valid_mark=1
-   restart: unless-stopped
+  bazarr:
+    image: lscr.io/linuxserver/bazarr
+    container_name: bazarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+    volumes:
+      - "/home/mau/multimedia/ext/config/bazarr/config/:/config"
+      - "/home/mau/multimedia/ext/tv_shows/:/tv_shows"
+      - "/home/mau/multimedia/ext/movies/:/movies"
+    ports:
+      - 6767:6767
+    restart: unless-stopped
 
-volumes:
-   prometheus_data: {}
-   grafana_data: {}
+  ombi:
+    image: lscr.io/linuxserver/ombi:latest
+    container_name: ombi
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+    volumes:
+      - "/home/mau/multimedia/ext/config/ombi/config/:/config"
+    ports:
+      - 3579:3579
+    restart: unless-stopped

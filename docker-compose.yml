@@ -1,22 +1,48 @@
 version: "3.7"
 services:
+  caddy:
+    image: caddy:<version>
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+      - 443:443/udp
+    volumes:
+      - "./Caddyfile:/etc/caddy/Caddyfile"
+      - "/home/server/.config/caddy/data/:/data"
+      - "/home/server/.config/caddy/config/:/config"
+
+  adguardhome:
+    image: adguard/adguardhome
+    container_name: adguard
+    ports:
+      - 53:53/tcp
+      - 53:53/udp
+      - 784:784/udp
+      - 853:853/tcp
+      - 3000:3000/tcp
+      - 83:80/tcp
+    volumes:
+      - "/home/server/.config/adguard/:/config"
+
   emby-server:
     image: emby/embyserver
-    container_name: emby-server
+    container_name: emby
     restart: unless-stopped
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Madrid
     volumes:
-      - "/home/mau/multimedia/ext/tv_shows/:/tv_shows"
-      - "/home/mau/multimedia/ext/movies/:/movies"
+      - "/home/server/.config/emby/:/config"
+      - "/home/server/ext/tv_shows/:/media/tv_shows"
+      - "/home/server/ext/movies/:/media/movies"
     ports:
       - 8096:8096 # HTTP port
       - 8920:8920 # HTTPS port
 
   qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:latest
+    image: cr.hotio.dev/hotio/qbittorrent
     container_name: qbittorrent
     environment:
       - PUID=1000
@@ -24,11 +50,9 @@ services:
       - TZ=Europe/Madrid
       - WEBUI_PORT=8080
     volumes:
-      - "/home/mau/multimedia/ext/tv_shows/:/tv_shows"
-      - "/home/mau/multimedia/ext/movies/:/movies"
-      - "/home/mau/multimedia/ext:/downloads"
-      - "/home/mau/.config/qbittorrent/:/config"
-      - "/home/mau/multimedia/ext/torrents:/torrents"
+      - "/home/server/.config/qbittorrent/:/config"
+      - "/home/server/ext:/media/downloads"
+      - "/home/server/ext/torrents:/media/torrents"
     ports:
       - 8080:8080
       - 6881:6881
@@ -43,8 +67,8 @@ services:
       - PGID=1000
       - TZ=Europe/Madrid
     volumes:
-      - "/home/mau/multimedia/ext/config/prowlarr/config/:/config"
-      - "/home/mau/multimedia/ext:/downloads"
+      - "/home/server/.config/prowlarr/:/config"
+      - "/home/server/ext:/media/downloads"
     ports:
       - 9696:9696
     restart: unless-stopped
@@ -57,9 +81,9 @@ services:
       - PGID=1000
       - TZ=Europe/Madrid
     volumes:
-      - "/home/mau/multimedia/ext/config/radarr/config/:/config"
-      - "/home/mau/multimedia/ext/movies/:/movies"
-      - "/home/mau/multimedia/ext:/downloads"
+      - "/home/server/.config/radarr/:/config"
+      - "/home/server/ext/movies/:/media/movies"
+      - "/home/server/ext/movies:/media/downloads/movies"
     ports:
       - 7878:7878
     restart: unless-stopped
@@ -72,9 +96,9 @@ services:
       - PGID=1000
       - TZ=Europe/Madrid
     volumes:
-      - "/home/mau/multimedia/ext/config/sonarr/config/:/config"
-      - "/home/mau/multimedia/ext/tv_shows/:/tv_shows"
-      - "/home/mau/multimedia/ext:/downloads"
+      - "/home/server/.config/sonarr/:/config"
+      - "/home/server/ext/tv_shows/:/media/tv_shows"
+      - "/home/server/ext:/media/downloads"
     ports:
       - 8989:8989
     restart: unless-stopped
@@ -87,22 +111,22 @@ services:
       - PGID=1000
       - TZ=Europe/Madrid
     volumes:
-      - "/home/mau/multimedia/ext/config/bazarr/config/:/config"
-      - "/home/mau/multimedia/ext/tv_shows/:/tv_shows"
-      - "/home/mau/multimedia/ext/movies/:/movies"
+      - "/home/server/.config/bazarr/:/config"
+      - "/home/server/multimedia/ext/tv_shows/:/media/tv_shows"
+      - "/home/server/multimedia/ext/movies/:/media/movies"
     ports:
       - 6767:6767
     restart: unless-stopped
 
   ombi:
-    image: lscr.io/linuxserver/ombi:latest
+    image: lscr.io/linuxserver/ombi
     container_name: ombi
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Madrid
     volumes:
-      - "/home/mau/multimedia/ext/config/ombi/config/:/config"
+      - "/home/server/.config/ombi/:/config"
     ports:
       - 3579:3579
     restart: unless-stopped

@@ -1,17 +1,5 @@
 version: "3.7"
 services:
-  caddy:
-    image: caddy:<version>
-    restart: unless-stopped
-    ports:
-      - 80:80
-      - 443:443
-      - 443:443/udp
-    volumes:
-      - "./Caddyfile:/etc/caddy/Caddyfile"
-      - "/home/server/.config/caddy/data/:/data"
-      - "/home/server/.config/caddy/config/:/config"
-
   adguardhome:
     image: adguard/adguardhome
     container_name: adguard

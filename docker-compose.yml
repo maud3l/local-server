@@ -1,5 +1,19 @@
 version: "3.7"
 services:
+  caddy:
+    build:
+      context: .
+      dockerfile: caddy.Dockerfile
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80" # For HTTP -> HTTPS redirects
+      - "443:443"
+    volumes:
+      - "$PWD/caddy/Caddyfile:/etc/caddy/Caddyfile"
+      - "/home/server/.config/caddy_config/:/config"
+      - "/home/server/.config/caddy_data/:/data"
+
   adguardhome:
     image: adguard/adguardhome
     container_name: adguard

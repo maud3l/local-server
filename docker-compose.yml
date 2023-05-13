@@ -13,8 +13,6 @@ services:
       - 443:443
     environment:
       - CADDY_INGRESS_NETWORKS=caddy
-      - PUID=1000
-      - PGID=1000
       - TZ=Europe/Madrid
     labels:
       caddy.email: you@example.com

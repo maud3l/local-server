@@ -13,136 +13,25 @@ services:
       - 443:443
     environment:
       - CADDY_INGRESS_NETWORKS=caddy
+    labels:
+      - caddy.email: you@example.com
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile
       - /home/server/.config/caddy_config/:/config
       - /home/server/.config/caddy_data/:/data
 
-  adguardhome:
-    image: adguard/adguardhome
-    container_name: adguard
-    labels:
-      caddy: adguard.local.com
-      caddy.reverse_proxy: "{{upstreams 80}}"
+  whoami:
+    image: containous/whoami
     networks:
       - caddy
-    ports:
-      - 53:53/tcp
-      - 53:53/udp
-      - 784:784/udp
-      - 853:853/tcp
-      - 3000:3000/tcp
-      - 83:80/tcp
-    volumes:
-      - /home/server/.config/adguard/:/config
-
-  emby-server:
-    image: emby/embyserver
-    container_name: emby
-    restart: unless-stopped
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Madrid
-    volumes:
-      - "/home/server/.config/emby/:/config"
-      - "/home/server/ext/tv_shows/:/media/tv_shows"
-      - "/home/server/ext/movies/:/media/movies"
-    ports:
-      - 8096:8096 # HTTP port
-      - 8920:8920 # HTTPS port
-
-  qbittorrent:
-    image: cr.hotio.dev/hotio/qbittorrent
-    container_name: qbittorrent
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Madrid
-      - WEBUI_PORT=8080
-    volumes:
-      - "/home/server/.config/qbittorrent/:/config"
-      - "/home/server/ext:/media/downloads"
-      - "/home/server/ext/torrents:/media/torrents"
-    ports:
-      - 8080:8080
-      - 6881:6881
-      - 6881:6881/udp
-    restart: unless-stopped
-
-  prowlarr:
-    image: lscr.io/linuxserver/prowlarr
-    container_name: prowlarr
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Madrid
-    volumes:
-      - "/home/server/.config/prowlarr/:/config"
-      - "/home/server/ext:/media/downloads"
-    ports:
-      - 9696:9696
-    restart: unless-stopped
-
-  radarr:
-    image: lscr.io/linuxserver/radarr:nightly
-    container_name: radarr
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Madrid
-    volumes:
-      - "/home/server/.config/radarr/:/config"
-      - "/home/server/ext/movies/:/media/movies"
-      - "/home/server/ext/movies:/media/downloads/movies"
-    ports:
-      - 7878:7878
-    restart: unless-stopped
-
-  sonarr:
-    image: lscr.io/linuxserver/sonarr
-    container_name: sonarr
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Madrid
-    volumes:
-      - "/home/server/.config/sonarr/:/config"
-      - "/home/server/ext/tv_shows/:/media/tv_shows"
-      - "/home/server/ext:/media/downloads"
-    ports:
-      - 8989:8989
-    restart: unless-stopped
-
-  bazarr:
-    image: lscr.io/linuxserver/bazarr
-    container_name: bazarr
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Madrid
-    volumes:
-      - "/home/server/.config/bazarr/:/config"
-      - "/home/server/multimedia/ext/tv_shows/:/media/tv_shows"
-      - "/home/server/multimedia/ext/movies/:/media/movies"
-    ports:
-      - 6767:6767
-    restart: unless-stopped
-
-  ombi:
-    image: lscr.io/linuxserver/ombi
-    container_name: ombi
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Madrid
-    volumes:
-      - "/home/server/.config/ombi/:/config"
-    ports:
-      - 3579:3579
-    restart: unless-stopped
+    deploy:
+      labels:
+        caddy: whoami.local.com
+        caddy.reverse_proxy: "{{upstreams 80}}"
+        caddy.tls: "internal"
 
 networks:
   caddy:
     external: true
+    driver: overlay

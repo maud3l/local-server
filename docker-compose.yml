@@ -72,8 +72,8 @@ services:
       caddy.tls: "internal"
     volumes:
       - /home/server/.config/emby/:/config
-      - /home/server/ext/tv/:/media/tv
-      - /home/server/ext/movies/:/media/movies
+      - /home/server/ext/tv/:/multimedia/tv
+      - /home/server/ext/movies/:/multimedia/movies
 
   prowlarr:
     image: lscr.io/linuxserver/prowlarr
@@ -101,7 +101,7 @@ services:
       - TZ=Europe/Madrid
     volumes:
       - /home/server/.config/radarr/:/config
-      - /home/server/ext/movies/:/media/movies
+      - /home/server/ext/movies/:/multimedia/movies
       - /home/server/ext/downloads_movies:/media/downloads_movies
     networks:
       - caddy
@@ -120,8 +120,8 @@ services:
       - TZ=Europe/Madrid
     volumes:
       - /home/server/.config/sonarr/:/config
-      - /home/server/ext/tv/:/media/tv
-      - /home/server/ext/downloads_tv:/media/downloads_tv
+      - /home/server/ext/tv/:/multimedia/tv
+      - /home/server/ext/downloads_tv:/multimedia/downloads_tv
     networks:
       - caddy
     labels:
@@ -139,8 +139,8 @@ services:
       - TZ=Europe/Madrid
     volumes:
       - /home/server/.config/bazarr/:/config
-      - /home/server/multimedia/ext/tv_shows/:/media/tv_shows
-      - /home/server/multimedia/ext/movies/:/media/movies
+      - /home/server/multimedia/ext/tv_shows/:/multimedia/tv_shows
+      - /home/server/multimedia/ext/movies/:/multimedia/movies
     networks:
       - caddy
     labels:
@@ -186,8 +186,8 @@ services:
       caddy.tls: "internal"
     volumes:
       - /home/server/.config/qbittorrent/:/config
-      - /home/server/ext/downloads_tv:/media/downloads_tv
-      - /home/server/ext/downloads_movies:/media/downloads_movies
+      - /home/server/ext/downloads_tv:/multimedia/downloads_tv
+      - /home/server/ext/downloads_movies:/multimedia/downloads_movies
       - /home/server/ext/torrents:/media/torrents
     restart: unless-stopped
 

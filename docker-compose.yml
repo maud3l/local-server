@@ -102,7 +102,7 @@ services:
     volumes:
       - /home/server/.config/radarr/:/config
       - /home/server/ext/movies/:/multimedia/movies
-      - /home/server/ext/downloads_movies:/media/downloads_movies
+      - /home/server/ext/downloads_movies:/multimedia/downloads_movies
     networks:
       - caddy
     labels:
@@ -188,7 +188,7 @@ services:
       - /home/server/.config/qbittorrent/:/config
       - /home/server/ext/downloads_tv:/multimedia/downloads_tv
       - /home/server/ext/downloads_movies:/multimedia/downloads_movies
-      - /home/server/ext/torrents:/media/torrents
+      - /home/server/ext/torrents:/multimedia/torrents
     restart: unless-stopped
 
 networks:

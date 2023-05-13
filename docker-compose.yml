@@ -13,6 +13,9 @@ services:
       - 443:443
     environment:
       - CADDY_INGRESS_NETWORKS=caddy
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
     labels:
       caddy.email: you@example.com
     volumes:
@@ -26,7 +29,7 @@ services:
     networks:
       - caddy
     labels:
-      caddy: whoami.local
+      caddy: whoami.local.xyz
       caddy.reverse_proxy: "{{upstreams 80}}"
       caddy.tls: "internal"
 
@@ -34,18 +37,40 @@ services:
     image: adguard/adguardhome
     container_name: adguard
     restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
     networks:
       - caddy
     labels:
-      caddy: adguard.local
+      caddy: adguard.local.xyz
       caddy.reverse_proxy: "{{upstreams 80}}"
       caddy.tls: "internal"
     ports:
       - 53:53/tcp
       - 53:53/udp
       - 3000:3000/tcp
+      - 83:80/tcp
     volumes:
       - /home/server/.config/adguard/:/config
+
+  ombi:
+    image: lscr.io/linuxserver/ombi
+    container_name: ombi
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+    networks:
+      - caddy
+    labels:
+      caddy: ombi.local.xyz
+      caddy.reverse_proxy: "{{upstreams 3579}}"
+      caddy.tls: "internal"
+    volumes:
+      - /home/server/.config/ombi/:/config
+    restart: unless-stopped
 
 networks:
   caddy:

@@ -1,3 +1,7 @@
+adguard.local {
+    reverse_proxy adguard:83
+  }
+
 emby.maudel.xyz {
-    reverse_proxy 127.0.0.1:8096
+    reverse_proxy emby:8096
 }

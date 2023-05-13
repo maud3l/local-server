@@ -1,6 +1,8 @@
 FROM caddy:2-builder AS builder
 
-RUN xcaddy build --with github.com/porech/caddy-maxmind-geolocation
+RUN xcaddy build \
+  --with github.com/porech/caddy-maxmind-geolocation \
+  --with github.com/lucaslorentz/caddy-docker-proxy/v2
 
 FROM caddy:latest
 

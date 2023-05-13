@@ -7,11 +7,14 @@ services:
     container_name: caddy
     restart: unless-stopped
     networks:
-      - servernetwork
+      - caddy
     ports:
       - "80:80" # For HTTP -> HTTPS redirects
       - "443:443"
+    environment:
+      - CADDY_INGRESS_NETWORKS=caddy
     volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
       - "./caddy/Caddyfile:/etc/caddy/Caddyfile"
       - "/home/server/.config/caddy_config/:/config"
       - "/home/server/.config/caddy_data/:/data"
@@ -20,7 +23,10 @@ services:
     image: adguard/adguardhome
     container_name: adguard
     networks:
-      - servernetwork
+      - caddy
+    labels:
+      caddy: adguard.local
+      caddy.reverse_proxy: "{{upstreams 80}}"
     ports:
       - 53:53/tcp
       - 53:53/udp
@@ -138,5 +144,5 @@ services:
     restart: unless-stopped
 
 networks:
-  servernetwork:
-    driver: bridge
+  caddy:
+    external: true

@@ -64,6 +64,8 @@ services:
       - TZ=Europe/Madrid
     networks:
       - caddy
+    ports:
+      - 8096:8096/tcp
     labels:
       caddy: emby.local.xyz
       caddy.reverse_proxy: "{{upstreams 8096}}"

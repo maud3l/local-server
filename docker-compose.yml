@@ -1,5 +1,9 @@
 version: "3.7"
 services:
+  ################################################
+  ### NETWORKING
+  ################################################
+
   caddy:
     build:
       context: ./caddy
@@ -24,15 +28,6 @@ services:
       - /home/server/.config/caddy_config/:/config
       - /home/server/.config/caddy_data/:/data
 
-  whoami:
-    image: containous/whoami
-    networks:
-      - caddy
-    labels:
-      caddy: whoami.local.xyz
-      caddy.reverse_proxy: "{{upstreams 80}}"
-      caddy.tls: "internal"
-
   adguardhome:
     image: adguard/adguardhome
     container_name: adguard
@@ -54,6 +49,29 @@ services:
       - 83:80/tcp
     volumes:
       - /home/server/.config/adguard/:/config
+
+  ################################################
+  ### MEDIA
+  ################################################
+
+  emby:
+    image: emby/embyserver
+    container_name: emby
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+    networks:
+      - caddy
+    labels:
+      caddy: emby.local.xyz
+      caddy.reverse_proxy: "{{upstreams 8096}}"
+      caddy.tls: "internal"
+    volumes:
+      - /home/server/.config/emby/:/config
+      - /home/server/ext/tv/:/media/tv
+      - /home/server/ext/movies/:/media/movies
 
   ombi:
     image: lscr.io/linuxserver/ombi

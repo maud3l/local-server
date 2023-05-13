@@ -65,9 +65,8 @@ services:
     networks:
       - caddy
     labels:
-      caddy: emby.local.xyz
+      caddy: http://emby.local.xyz
       caddy.reverse_proxy: "{{upstreams 8096}}"
-      caddy.tls: "internal"
     volumes:
       - /home/server/.config/emby/:/config
       - /home/server/ext/tv/:/media/tv

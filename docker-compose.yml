@@ -92,6 +92,28 @@ services:
       - /home/server/.config/ombi/:/config
     restart: unless-stopped
 
+  ################################################
+  ### DOWNLOADS
+  ################################################
+
+  qbittorrent:
+    image: cr.hotio.dev/hotio/qbittorrent
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+      - WEBUI_PORT=8080
+    labels:
+      caddy: torrent.local.xyz
+      caddy.reverse_proxy: "{{upstreams 8080}}"
+      caddy.tls: "internal"
+    volumes:
+      - /home/server/.config/qbittorrent/:/config
+      - /home/server/ext:/media/downloads
+      - /home/server/ext/torrents:/media/torrents
+    restart: unless-stopped
+
 networks:
   caddy:
     external: true

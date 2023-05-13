@@ -1,3 +1,4 @@
-emby.maudel.xyz {
-    reverse_proxy emby:8096
+example.local.xyz {
+    respond / "Hello World" 200
+    tls internal
 }

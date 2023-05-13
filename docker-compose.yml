@@ -6,6 +6,8 @@ services:
       dockerfile: Dockerfile
     container_name: caddy
     restart: unless-stopped
+    networks:
+      - servernetwork
     ports:
       - "80:80" # For HTTP -> HTTPS redirects
       - "443:443"
@@ -17,6 +19,8 @@ services:
   adguardhome:
     image: adguard/adguardhome
     container_name: adguard
+    networks:
+      - servernetwork
     ports:
       - 53:53/tcp
       - 53:53/udp
@@ -132,3 +136,7 @@ services:
     ports:
       - 3579:3579
     restart: unless-stopped
+
+networks:
+  servernetwork:
+    driver: host

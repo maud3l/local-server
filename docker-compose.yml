@@ -75,6 +75,80 @@ services:
       - /home/server/ext/tv/:/media/tv
       - /home/server/ext/movies/:/media/movies
 
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+    volumes:
+      - /home/server/.config/prowlarr/:/config
+    networks:
+      - caddy
+    labels:
+      caddy: prowlarr.local.xyz
+      caddy.reverse_proxy: "{{upstreams 9696}}"
+      caddy.tls: "internal"
+    restart: unless-stopped
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:nightly
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+    volumes:
+      - /home/server/.config/radarr/:/config
+      - /home/server/ext/movies/:/media/movies
+      - /home/server/ext/downloads_movies:/media/downloads_movies
+    networks:
+      - caddy
+    labels:
+      caddy: radarr.local.xyz
+      caddy.reverse_proxy: "{{upstreams 7878}}"
+      caddy.tls: "internal"
+    restart: unless-stopped
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+    volumes:
+      - /home/server/.config/sonarr/:/config
+      - /home/server/ext/tv/:/media/tv
+      - /home/server/ext/downloads_tv:/media/downloads_tv
+    networks:
+      - caddy
+    labels:
+      caddy: sonarr.local.xyz
+      caddy.reverse_proxy: "{{upstreams 8989}}"
+      caddy.tls: "internal"
+    restart: unless-stopped
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr
+    container_name: bazarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+    volumes:
+      - /home/server/.config/bazarr/:/config
+      - /home/server/multimedia/ext/tv_shows/:/media/tv_shows
+      - /home/server/multimedia/ext/movies/:/media/movies
+    networks:
+      - caddy
+    labels:
+      caddy: bazarr.local.xyz
+      caddy.reverse_proxy: "{{upstreams 6767}}"
+      caddy.tls: "internal"
+    restart: unless-stopped
+
   ombi:
     image: lscr.io/linuxserver/ombi
     container_name: ombi
@@ -104,13 +178,16 @@ services:
       - PGID=1000
       - TZ=Europe/Madrid
       - WEBUI_PORT=8080
+    networks:
+      - caddy
     labels:
       caddy: torrent.local.xyz
       caddy.reverse_proxy: "{{upstreams 8080}}"
       caddy.tls: "internal"
     volumes:
       - /home/server/.config/qbittorrent/:/config
-      - /home/server/ext:/media/downloads
+      - /home/server/ext/downloads_tv:/media/downloads_tv
+      - /home/server/ext/downloads_movies:/media/downloads_movies
       - /home/server/ext/torrents:/media/torrents
     restart: unless-stopped
 

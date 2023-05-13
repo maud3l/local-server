@@ -26,9 +26,25 @@ services:
     networks:
       - caddy
     labels:
-      caddy: whoami.local.com
+      caddy: whoami.local
       caddy.reverse_proxy: "{{upstreams 80}}"
       caddy.tls: "internal"
+
+  adguardhome:
+  image: adguard/adguardhome
+  container_name: adguard
+  networks:
+    - caddy
+  labels:
+    caddy: adguard.local
+    caddy.reverse_proxy: "{{upstreams 80}}"
+    caddy.tls: "internal"
+  ports:
+    - 53:53/tcp
+    - 53:53/udp
+    - 3000:3000/tcp
+  volumes:
+    - /home/server/.config/adguard/:/config
 
 networks:
   caddy:

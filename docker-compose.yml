@@ -139,4 +139,4 @@ services:
 
 networks:
   servernetwork:
-    driver: host
+    driver: bridge

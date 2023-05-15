@@ -159,9 +159,8 @@ services:
     networks:
       - caddy
     labels:
-      caddy: ombi.local.xyz
+      caddy: http://ombi.local.xyz
       caddy.reverse_proxy: "{{upstreams 3579}}"
-      caddy.tls: "internal"
     volumes:
       - /home/server/.config/ombi/:/config
     restart: unless-stopped

@@ -2,3 +2,8 @@ example.local.xyz {
     respond / "Hello World" 200
     tls internal
 }
+
+wireguard.myhomelab.com {
+  reverse_proxy wireguard:51821
+}
+

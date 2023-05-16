@@ -54,8 +54,8 @@ services:
   wireguard:
     container_name: wireguard
     environment:
-      - WG_HOST=
-      - PASSWORD=
+      - WG_HOST=vpn.mydomain.com
+      - PASSWORD=my-password
     image: weejewel/wg-easy
     networks:
       - caddy

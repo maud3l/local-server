@@ -1,267 +1,220 @@
 version: "3.7"
 services:
+  ################################################
+  ### NETWORKING
+  ################################################
 
-  blocky:
-   image: spx01/blocky
-   container_name: blocky
-   restart: unless-stopped
-   ports:
-    - "53:53/tcp"
-    - "53:53/udp"
-   environment:
-     - VIRTUAL_HOST=blocky.local.io
-     - VIRTUAL_PORT=4000
-   volumes:
-     - ./blocky/config.yml:/app/config.yml
+  caddy:
+    build:
+      context: ./caddy
+      dockerfile: Dockerfile
+    container_name: caddy
+    restart: unless-stopped
+    networks:
+      - caddy
+    ports:
+      - 80:80 # For HTTP -> HTTPS redirects
+      - 443:443
+    environment:
+      - CADDY_INGRESS_NETWORKS=caddy
+      - CADDY_DOCKER_CADDYFILE_PATH=/etc/caddy/Caddyfile
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+    labels:
+      caddy.email: my@email.com
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_config:/config
+      - caddy_data:/data
 
-  prometheus:
-   image: prom/prometheus
-   container_name: prometheus
-   environment:
-     - VIRTUAL_HOST=prometheus.local.io
-     - VIRTUAL_PORT=9090
-   volumes:
-     - "./prometheus/:/etc/prometheus/"
-     - "prometheus_data:/prometheus"
-   command:
-     - '--config.file=/etc/prometheus/prometheus.yml'
-     - '--storage.tsdb.path=/prometheus'
-     - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-     - '--web.console.templates=/usr/share/prometheus/consoles'
-   restart: always
-   links:
-     - cadvisor:cadvisor
-     - node-exporter:node-exporter
-
-  node-exporter:
-    image: prom/node-exporter:latest
-    container_name: node-exporter
+  adguardhome:
+    image: adguard/adguardhome
+    container_name: adguard
     restart: unless-stopped
     environment:
-      - VIRTUAL_HOST=node-exporter.loca.io
-      - VIRTUAL_PORT=9100
-
-  cadvisor:
-    image: google/cadvisor:latest
-    container_name: cadvisor
-    restart: unless-stopped
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+    networks:
+      - caddy
+    labels:
+      caddy: adguard.local.xyz
+      caddy.reverse_proxy: "{{upstreams 80}}"
+      caddy.tls: "internal"
+    ports:
+      - 53:53/tcp
+      - 53:53/udp
+      - 3000:3000/tcp
+      - 83:80/tcp
     volumes:
-      - "/:/rootfs:ro"
-      - "/var/run:/var/run:rw"
-      - "/sys:/sys:ro"
-      - "/var/lib/docker/:/var/lib/docker:ro"
-    environment:
-      - VIRTUAL_HOST=cadvisor.local.io
-      - VIRTUAL_PORT=8080
-
-  grafana:
-   image: grafana/grafana:6.7.1
-   container_name: grafana
-   depends_on:
-     - prometheus
-   volumes:
-     - grafana_data:/var/lib/grafana
-     - ./grafana/provisioning/:/etc/grafana/provisioning/
-   environment:
-     - VIRTUAL_HOST=grafana.local.io
-     - VIRTUAL_PORT=3000
-     - GF_PANELS_DISABLE_SANITIZE_HTML=true
-     - GF_INSTALL_PLUGINS=grafana-piechart-panel
-   restart: always
-
-  nginx-proxy:
-   image: nginxproxy/nginx-proxy
-   container_name: nginx-proxy
-   restart: unless-stopped
-   ports:
-    - "80:80"
-   volumes:
-     - /var/run/docker.sock:/tmp/docker.sock:ro
-
-  emby-server:
-   image: emby/embyserver
-   container_name: emby-server
-   restart: unless-stopped
-   environment:
-     - VIRTUAL_HOST=emby.local.io
-     - VIRTUAL_PORT=8096
-   volumes:
-     - "/media/multimedia/tv_shows/:/tv_shows"
-     - "/media/multimedia/music/:/music"
-     - "/media/multimedia/movies/:/movies"
-
-  deluge:
-   image: lscr.io/linuxserver/deluge
-   container_name: deluge
-   restart: unless-stopped
-   environment:
-     - VIRTUAL_HOST=deluge.local.io
-     - VIRTUAL_PORT=8112
-   volumes:
-     - "/home/mauro/.config/deluge/:/config"
-     - "/media/multimedia/:/downloads"
-     - "/media/multimedia/torrents:/torrents"
-     - "/media/multimedia/tv_shows/:/tv_shows"
-     - "/media/multimedia/movies/:/movies"
-     - "/media/multimedia/music/:/music"
-
-  jackett:
-   image: lscr.io/linuxserver/jackett
-   container_name: jackett
-   environment:
-     - VIRTUAL_HOST=jackett.local.io
-     - VIRTUAL_PORT=9117
-   volumes:
-     - "./jackett/config/:/config"
-     - "/media/multimedia/torrents:/downloads"
-   restart: unless-stopped
-
-   #prowlarr:
-   # image: lscr.io/linuxserver/prowlarr
-   # container_name: prowlarr
-   # environment:
-   #   - VIRTUAL_HOST=prowlarr.local.io
-   #   - VIRTUAL_PORT=9696
-   # volumes:
-   #   - "./prowlarr/config/:/config"
-   #   - "/media/multimedia/torrents:/downloads"
-   # restart: unless-stopped
-
-  flaresolverr:
-   image: ghcr.io/flaresolverr/flaresolverr:latest
-   container_name: flaresolverr
-   depends_on:
-     - jackett
-   environment:
-    - VIRTUAL_HOST=flaresolverr.local.io
-    - VIRTUAL_PORT=8191
-   restart: unless-stopped
-
-  ombi:
-   image: lscr.io/linuxserver/ombi
-   container_name: ombi
-   environment:
-     - VIRTUAL_HOST=ombi.local.io
-     - VIRTUAL_PORT=3579
-   volumes:
-     - "./ombi/config:/config"
-
-  pyload:
-   image: lscr.io/linuxserver/pyload
-   container_name: pyload
-   environment:
-     - VIRTUAL_HOST=pyload.local.io
-     - VIRTUAL_PORT=8000
-   restart: unless-stopped
-   volumes:
-     - "./pyload/config:/config"
-     - "/media/multimedia/pyload/:/downloads"
-
-  filerundb:
-   image: mariadb:10.1
-   container_name: mariadb_filerun
-   environment:
-     - MYSQL_ROOT_PASSWORD=password
-     - MYSQL_USER=admin
-     - MYSQL_PASSWORD=password
-     - MYSQL_DATABASE=filerun_database
-   volumes:
-     - "/filerun/db:/var/lib/mysql"
-
-  filerun:
-   image: filerun/filerun
-   container_name: filerun
-   environment:
-     - FR_DB_HOST=filerundb
-     - FR_DB_PORT=3306
-     - FR_DB_NAME=filerun_database
-     - FR_DB_USER=admin
-     - FR_DB_PASS=password
-     - VIRTUAL_HOST=filerun.local.io
-   depends_on:
-     - filerundb
-   links:
-     - filerundb:filerundb
-   volumes:
-     - "/filerun/html:/var/www/html"
-     - "/filerun/user-files:/user-files"
-
-  embystat:
-   image: lscr.io/linuxserver/embystat
-   container_name: embystat
-   environment:
-     - VIRTUAL_HOST=embystat.local.io
-     - VIRTUAL_PORT=6555
-   volumes:
-     - "./embystat/config/:/config"
-   restart: unless-stopped
-
-  bazarr:
-   image: lscr.io/linuxserver/bazarr
-   container_name: bazarr
-   environment:
-     - VIRTUAL_HOST=bazarr.local.io
-     - VIRTUAL_PORT=6767
-   volumes:
-     - "./bazarr/config/:/config"
-     - "/media/multimedia/tv_shows/:/tv_shows"
-     - "/media/multimedia/music/:/music"
-     - "/media/multimedia/movies/:/movies"
-   restart: unless-stopped
-
-  radarr:
-   image: lscr.io/linuxserver/radarr
-   container_name: radarr
-   environment:
-     - VIRTUAL_HOST=radarr.local.io
-     - VIRTUAL_PORT=7878
-   volumes:
-     - "/media/multimedia/radarr/config/:/config"
-     - "/media/multimedia/movies/:/movies"
-     - "/media/multimedia/:/downloads"
-   restart: unless-stopped
-
-  sonarr:
-   image: lscr.io/linuxserver/sonarr
-   container_name: sonarr
-   environment:
-     - VIRTUAL_HOST=sonarr.local.io
-     - VIRTUAL_PORT=8989
-   volumes:
-     - "/media/multimedia/sonarr/config/:/config"
-     - "/media/multimedia/tv_shows/:/tv_shows"
-     - "/media/multimedia/:/downloads"
-   restart: unless-stopped
-
-  calibre:
-    image: lscr.io/linuxserver/calibre
-    container_name: calibre
-    environment:
-      - VIRTUAL_HOST=calibre.local.io
-      - VIRTUAL_PORT=8080
-    volumes:
-      - "./calibre/config/:/config"
-      - "/media/multimedia/books/:/books"
+      - /home/server/.config/adguard/:/config
 
   wireguard:
-   image: weejewel/wg-easy
-   container_name: wireguard
-   environment:
-     - VIRTUAL_HOST=wireguard.local.io
-     - VIRTUAL_PORT=51821
-     - PEERS=5
-   volumes:
-     - "./wireguard/config:/config"
-     - "/lib/modules:/lib/modules"
-   cap_add:
-     - NET_ADMIN
-     - SYS_MODULE
-   ports:
-     - "51820:51820/udp"
-   sysctls:
-     - net.ipv4.conf.all.src_valid_mark=1
-   restart: unless-stopped
+    container_name: wireguard
+    environment:
+      - WG_HOST=vpn.mydomain.com
+      - PASSWORD=my-password
+    image: weejewel/wg-easy
+    networks:
+      - caddy
+    volumes:
+      - ~/.config/wireguard:/etc/wireguard
+    ports:
+      - 51820:51820/udp
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv4.conf.all.src_valid_mark=1
+
+  ################################################
+  ### MEDIA
+  ################################################
+
+  emby:
+    image: emby/embyserver
+    container_name: emby
+    restart: unless-stopped
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+    networks:
+      - caddy
+    ports:
+      - 8096:8096/tcp
+    labels:
+      caddy: emby.local.xyz
+      caddy.reverse_proxy: "{{upstreams 8096}}"
+      caddy.tls: "internal"
+    volumes:
+      - /home/server/.config/emby/:/config
+      - /home/server/ext/tv/:/multimedia/tv
+      - /home/server/ext/movies/:/multimedia/movies
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+    volumes:
+      - /home/server/.config/prowlarr/:/config
+    networks:
+      - caddy
+    labels:
+      caddy: prowlarr.local.xyz
+      caddy.reverse_proxy: "{{upstreams 9696}}"
+      caddy.tls: "internal"
+    restart: unless-stopped
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:nightly
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+    volumes:
+      - /home/server/.config/radarr/:/config
+      - /home/server/ext/movies/:/multimedia/movies
+      - /home/server/ext/downloads_movies:/multimedia/downloads_movies
+    networks:
+      - caddy
+    labels:
+      caddy: radarr.local.xyz
+      caddy.reverse_proxy: "{{upstreams 7878}}"
+      caddy.tls: "internal"
+    restart: unless-stopped
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+    volumes:
+      - /home/server/.config/sonarr/:/config
+      - /home/server/ext/tv/:/multimedia/tv
+      - /home/server/ext/downloads_tv:/multimedia/downloads_tv
+    networks:
+      - caddy
+    labels:
+      caddy: sonarr.local.xyz
+      caddy.reverse_proxy: "{{upstreams 8989}}"
+      caddy.tls: "internal"
+    restart: unless-stopped
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr
+    container_name: bazarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+    volumes:
+      - /home/server/.config/bazarr/:/config
+      - /home/server/multimedia/ext/tv_shows/:/multimedia/tv_shows
+      - /home/server/multimedia/ext/movies/:/multimedia/movies
+    networks:
+      - caddy
+    labels:
+      caddy: bazarr.local.xyz
+      caddy.reverse_proxy: "{{upstreams 6767}}"
+      caddy.tls: "internal"
+    restart: unless-stopped
+
+  ombi:
+    image: lscr.io/linuxserver/ombi
+    container_name: ombi
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+    networks:
+      - caddy
+    labels:
+      caddy: http://ombi.local.xyz
+      caddy.reverse_proxy: "{{upstreams 3579}}"
+    volumes:
+      - /home/server/.config/ombi/:/config
+    restart: unless-stopped
+
+  ################################################
+  ### DOWNLOADS
+  ################################################
+
+  qbittorrent:
+    image: cr.hotio.dev/hotio/qbittorrent
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+      - WEBUI_PORT=8080
+    networks:
+      - caddy
+    labels:
+      caddy: torrent.local.xyz
+      caddy.reverse_proxy: "{{upstreams 8080}}"
+      caddy.tls: "internal"
+    volumes:
+      - /home/server/.config/qbittorrent/:/config
+      - /home/server/ext/downloads_tv:/multimedia/downloads_tv
+      - /home/server/ext/downloads_movies:/multimedia/downloads_movies
+      - /home/server/ext/torrents:/multimedia/torrents
+    restart: unless-stopped
+
+networks:
+  caddy:
+    external: true
 
 volumes:
-   prometheus_data: {}
-   grafana_data: {}
+  caddy_data:
+  caddy_config:

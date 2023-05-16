@@ -16,7 +16,7 @@ services:
       - 80:80 # For HTTP -> HTTPS redirects
       - 443:443
     environment:
-      - CADDY_INGRESS_NETWORKS=caddy
+      - CADDY_INGRESS_NETWORKS_PATH=caddy
       - CADDY_DOCKER_CADDYFILE=/etc/caddy/Caddyfile
       - PUID=1000
       - PGID=1000
@@ -57,7 +57,6 @@ services:
       - WG_HOST=
       - PASSWORD=
     image: weejewel/wg-easy
-    container_name: wg-easy
     networks:
       - caddy
     volumes:
@@ -71,7 +70,6 @@ services:
     sysctls:
       - net.ipv4.ip_forward=1
       - net.ipv4.conf.all.src_valid_mark=1
-
 
   ################################################
   ### MEDIA

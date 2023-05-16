@@ -1,10 +1,18 @@
 (custom_log) {
   log {
-    format transform `{[{ts}] - request>remote_ip} - {request>uri}" {status}` {
-	time_format "02/Jan/2006:15:04:05 -0700"
-}
+    format transform "{common_log}"
   }
 }
+
+(internal_routing) (
+  @internal {
+    remote_ip 192.168.0.0/16 172.0.0.0/8
+  }
+  handle @internal {
+    reverse_proxy {args.0}:{args.1}
+  }
+  respond 403
+)
 
 vpn.mydomain.com {
   import custom_log
@@ -17,12 +25,16 @@ ombi.mydomain.com {
 }
 
 dns.mydomain.com {
-  log
-  @internal {
-    remote_ip 192.168.0.0/16 172.0.0.0/8
-  }
-  handle @internal {
-    reverse_proxy adguard:80
-  }
-  respond 403
+  import custom_log
+  import internal_routing "adguard" "80"
+}
+
+radarr.mydomain.com {
+  import custom_log
+  import internal_routing "radarr" "7878"
+}
+
+sonarr.mydomain.com {
+  import custom_log
+  import internal_routing "sonarr" "8989"
 }

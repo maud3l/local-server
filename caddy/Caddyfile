@@ -38,3 +38,8 @@ sonarr.mydomain.com {
   import custom_log
   import internal_routing "sonarr" "8989"
 }
+
+torrent.mydomain.com {
+  import custom_log
+  import internal_routing "qbittorrent" "8080"
+}

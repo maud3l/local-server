@@ -3,7 +3,8 @@ FROM caddy:${CADDY_VERSION}-builder AS builder
 
 RUN xcaddy build \
   --with github.com/porech/caddy-maxmind-geolocation \
-  --with github.com/lucaslorentz/caddy-docker-proxy/v2
+  --with github.com/lucaslorentz/caddy-docker-proxy/v2 \
+  --with github.com/caddyserver/transform-encoder
 
 FROM caddy:${CADDY_VERSION}-alpine
 

@@ -1,4 +1,28 @@
-vpn.myhomelab.com {
+(custom_log) {
+  log {
+    format transform `{[{ts}] - request>remote_ip} - {request>uri}" {status}` {
+	time_format "02/Jan/2006:15:04:05 -0700"
+}
+  }
+}
+
+vpn.mydomain.com {
+  import custom_log
   reverse_proxy wireguard:51821
 }
 
+ombi.mydomain.com {
+  import custom_log
+  reverse_proxy ombi:3579
+}
+
+dns.mydomain.com {
+  log
+  @internal {
+    remote_ip 192.168.0.0/16 172.0.0.0/8
+  }
+  handle @internal {
+    reverse_proxy adguard:80
+  }
+  respond 403
+}

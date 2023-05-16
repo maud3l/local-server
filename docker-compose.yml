@@ -16,8 +16,8 @@ services:
       - 80:80 # For HTTP -> HTTPS redirects
       - 443:443
     environment:
-      - CADDY_INGRESS_NETWORKS_PATH=caddy
-      - CADDY_DOCKER_CADDYFILE=/etc/caddy/Caddyfile
+      - CADDY_INGRESS_NETWORKS=caddy
+      - CADDY_DOCKER_CADDYFILE_PATH=/etc/caddy/Caddyfile
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Madrid

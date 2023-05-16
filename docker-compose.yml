@@ -17,6 +17,7 @@ services:
       - 443:443
     environment:
       - CADDY_INGRESS_NETWORKS=caddy
+      - CADDY_DOCKER_CADDYFILE=/etc/caddy/Caddyfile
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Madrid
@@ -53,15 +54,16 @@ services:
   wireguard:
     container_name: wireguard
     environment:
-      - WG_HOST=""
-      - PASSWORD=""
+      - WG_HOST=
+      - PASSWORD=
     image: weejewel/wg-easy
     container_name: wg-easy
-    hostname: wg-easy
+    networks:
+      - caddy
     volumes:
       - ~/.config/wireguard:/etc/wireguard
     ports:
-      - "51820:51820/udp"
+      - 51820:51820/udp
     restart: unless-stopped
     cap_add:
       - NET_ADMIN

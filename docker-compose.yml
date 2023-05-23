@@ -50,7 +50,8 @@ services:
       - 3000:3000/tcp
       - 83:80/tcp
     volumes:
-      - adguard_config:/config
+      - adguard_conf:/opt/adguardhome/conf
+      - adguard_work:/opt/adguardhome/work
 
   wireguard:
     container_name: wireguard
@@ -226,4 +227,5 @@ networks:
 volumes:
   caddy_data:
   caddy_config:
-  adguard_config:
+  adguard_work:
+  adguard_conf:

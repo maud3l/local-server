@@ -6,7 +6,7 @@
 
 (internal_routing) {
   @internal {
-    remote_ip 192.168.0.0/16 172.0.0.0/8
+    remote_ip 192.168.0.0/16 172.0.0.0/8 10.0.0.0/8
   }
   handle @internal {
     reverse_proxy {args.0}:{args.1}

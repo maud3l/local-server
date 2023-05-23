@@ -43,13 +43,14 @@ services:
       caddy: adguard.local.xyz
       caddy.reverse_proxy: "{{upstreams 80}}"
       caddy.tls: "internal"
+      caddy.import: custom_log
     ports:
       - 53:53/tcp
       - 53:53/udp
       - 3000:3000/tcp
       - 83:80/tcp
     volumes:
-      - /home/server/.config/adguard/:/config
+      - adguard_config:/config
 
   wireguard:
     container_name: wireguard
@@ -91,6 +92,7 @@ services:
       caddy: emby.local.xyz
       caddy.reverse_proxy: "{{upstreams 8096}}"
       caddy.tls: "internal"
+      caddy.import: custom_log
     volumes:
       - /home/server/.config/emby/:/config
       - /home/server/ext/tv/:/multimedia/tv
@@ -111,6 +113,7 @@ services:
       caddy: prowlarr.local.xyz
       caddy.reverse_proxy: "{{upstreams 9696}}"
       caddy.tls: "internal"
+      caddy.import: custom_log
     restart: unless-stopped
 
   radarr:
@@ -130,6 +133,7 @@ services:
       caddy: radarr.local.xyz
       caddy.reverse_proxy: "{{upstreams 7878}}"
       caddy.tls: "internal"
+      caddy.import: custom_log
     restart: unless-stopped
 
   sonarr:
@@ -149,6 +153,7 @@ services:
       caddy: sonarr.local.xyz
       caddy.reverse_proxy: "{{upstreams 8989}}"
       caddy.tls: "internal"
+      caddy.import: custom_log
     restart: unless-stopped
 
   bazarr:
@@ -168,6 +173,7 @@ services:
       caddy: bazarr.local.xyz
       caddy.reverse_proxy: "{{upstreams 6767}}"
       caddy.tls: "internal"
+      caddy.import: custom_log
     restart: unless-stopped
 
   ombi:
@@ -182,6 +188,7 @@ services:
     labels:
       caddy: http://ombi.local.xyz
       caddy.reverse_proxy: "{{upstreams 3579}}"
+      caddy.import: custom_log
     volumes:
       - /home/server/.config/ombi/:/config
     restart: unless-stopped
@@ -204,6 +211,7 @@ services:
       caddy: torrent.local.xyz
       caddy.reverse_proxy: "{{upstreams 8080}}"
       caddy.tls: "internal"
+      caddy.import: custom_log
     volumes:
       - /home/server/.config/qbittorrent/:/config
       - /home/server/ext/downloads_tv:/multimedia/downloads_tv
@@ -218,3 +226,4 @@ networks:
 volumes:
   caddy_data:
   caddy_config:
+  adguard_config:

@@ -17,12 +17,7 @@
 (jail2ban_log) {
   log {
     format transform "{common_log}"
-    output file /var/log/caddy/{args.0}Proxy.log {
-      roll_size       5MiB
-      roll_local_time true
-      roll_keep 4
-      roll_keep_for 7d
-  }
+    output file /var/log/caddy/{args.0}Access.log
     level ERROR
   }
 }
@@ -33,12 +28,11 @@ vpn.mydomain.com {
 }
 
 emby.mydomain.com {
-    import jail2ban_log "Emby"
     reverse_proxy emby:8096
 }
 
 ombi.mydomain.com {
-  import custom_log
+  import jail2ban_log "Ombi"
   reverse_proxy ombi:3579
 }
 

@@ -31,7 +31,9 @@ services:
       - caddy_access_log:/var/log/caddy
 
   fail2ban:
-    image: lscr.io/linuxserver/fail2ban:latest
+    build:
+      context: ./fail2ban
+      dockerfile: Dockerfile
     container_name: fail2ban
     cap_add:
       - NET_ADMIN
@@ -43,7 +45,6 @@ services:
       - TZ=Etc/UTC
     volumes:
       - ~/.config/fail2ban:/config
-      - ./fail2ban:/etc/fail2ban
       - caddy_access_log:/var/log/caddy:ro
     restart: unless-stopped
 

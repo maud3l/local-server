@@ -5,3 +5,4 @@ enabled = true
 banTime = 3600
 findTime = 600
 maxretry = 3
+chain   = DOCKER-USER

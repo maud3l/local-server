@@ -28,6 +28,25 @@ services:
       - ./caddy/Caddyfile:/etc/caddy/Caddyfile
       - caddy_config:/config
       - caddy_data:/data
+      - caddy_access_log:/var/log/caddy
+
+  fail2ban:
+    image: lscr.io/linuxserver/fail2ban:latest
+    container_name: fail2ban
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ~/.config/fail2ban:/config
+      - ./fail2ban/jail.d/:/etc/fail2ban/jail.d/
+      - ./fail2ban/filter.d/:/etc/fail2ban/filted.d/
+      - caddy_access_log:/var/log/caddy:ro
+    restart: unless-stopped
 
   adguardhome:
     image: adguard/adguardhome
@@ -227,5 +246,6 @@ networks:
 volumes:
   caddy_data:
   caddy_config:
+  caddy_access_log:
   adguard_work:
   adguard_conf:

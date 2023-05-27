@@ -29,9 +29,8 @@ vpn.mydomain.com {
 }
 
 emby.mydomain.com {
-    import custom_log
-    import internal_routing "emby" "8096"
-    #reverse_proxy emby:8096
+    import jail2ban_log "Emby"
+    reverse_proxy emby:8096
 }
 
 ombi.mydomain.com {

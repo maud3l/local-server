@@ -43,8 +43,6 @@ services:
       - TZ=Etc/UTC
     volumes:
       - ~/.config/fail2ban:/config
-      - ./fail2ban/jail.d/:/etc/fail2ban/jail.d/
-      - ./fail2ban/filter.d/:/etc/fail2ban/filted.d/
       - caddy_access_log:/var/log/caddy:ro
     restart: unless-stopped
 

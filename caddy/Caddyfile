@@ -58,6 +58,12 @@
 }
 }
 
+auth.mydomain.com {
+    route {
+        authenticate with myportal
+    }
+}
+
 vpn.mydomain.com {
   route {
   	authorize with mypolicy

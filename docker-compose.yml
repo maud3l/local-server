@@ -18,6 +18,9 @@ services:
     environment:
       - CADDY_INGRESS_NETWORKS=caddy
       - CADDY_DOCKER_CADDYFILE_PATH=/etc/caddy/Caddyfile
+      - AUTHP_ADMIN_USER=my-user
+      - AUTHP_ADMIN_EMAIL=my@email.com
+      - AUTHP_ADMIN_SECRET=auth-password
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Madrid
@@ -74,7 +77,7 @@ services:
     container_name: wireguard
     environment:
       - WG_HOST=vpn.mydomain.com
-      - PASSWORD=my-password
+      - PASSWORD=vpn-password
     image: weejewel/wg-easy
     networks:
       - caddy

@@ -58,19 +58,6 @@
 }
 }
 
-{
-  security {
-    local identity store localdb {
-      realm local
-      path {$HOME}/.local/caddy/users.json
-    }
-
-    authentication portal myportal {
-      enable identity store localdb
-    }
-  }
-}
-
 vpn.mydomain.com {
   route {
   	authorize with mypolicy

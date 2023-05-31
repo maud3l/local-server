@@ -16,9 +16,8 @@
 
 (jail2ban_log) {
   log {
-    format transform "{common_log}"
-    output file /var/log/caddy/{args.0}Access.log
-    level ERROR
+    format json
+    output file /var/log/caddy/CaddyAccess.json
   }
 }
 
@@ -75,12 +74,12 @@ vpn.mydomain.com {
 }
 
 emby.mydomain.com {
-    import jail2ban_log "Emby"
+    import jail2ban_log
     reverse_proxy emby:8096
 }
 
 ombi.mydomain.com {
-  import jail2ban_log "Ombi"
+  import jail2ban_log
   reverse_proxy ombi:3579
 }
 

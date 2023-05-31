@@ -240,6 +240,29 @@ services:
       - /home/server/ext/torrents:/multimedia/torrents
     restart: unless-stopped
 
+  ################################################
+  ### MONITORING
+  ################################################
+
+  scrutiny:
+    container_name: scrutiny
+    image: ghcr.io/analogj/scrutiny:master-omnibus
+    networks:
+      - caddy
+    cap_add:
+      - SYS_RAWIO
+      - SYS_ADMIN
+    labels:
+      caddy: hd.local.xyz
+      caddy.reverse_proxy: "{{upstreams 8080}}"
+      caddy.tls: "internal"
+    volumes:
+      - /run/udev:/run/udev:ro
+      - ~/.config/scrutiny:/opt/scrutiny/config
+      - ~/.config/scrutiny/influxdb:/opt/scrutiny/influxdb
+    devices:
+      - "/dev/sda"
+      - "/dev/sdb"
 networks:
   caddy:
     external: true

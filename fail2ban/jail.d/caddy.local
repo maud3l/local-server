@@ -1,7 +1,7 @@
-[ombi]
+[caddy]
 ignoreip = 127.0.0.0/8 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16
-port    = 3579
-logpath = /var/log/caddy/OmbiAccess.log
+port    = 443,80
+logpath = /var/log/caddy/CaddyAccess.json
 enabled = true
 banTime = 3600
 findTime = 600

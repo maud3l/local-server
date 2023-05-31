@@ -1,9 +1,3 @@
-(custom_log) {
-  log {
-    format transform "{common_log}"
-  }
-}
-
 (internal_routing) {
   @internal {
     remote_ip 192.168.0.0/16 172.0.0.0/8 10.0.0.0/8
@@ -84,21 +78,17 @@ ombi.mydomain.com {
 }
 
 dns.mydomain.com {
-  import custom_log
   import internal_routing "adguard" "80"
 }
 
 radarr.mydomain.com {
-  import custom_log
   import internal_routing "radarr" "7878"
 }
 
 sonarr.mydomain.com {
-  import custom_log
   import internal_routing "sonarr" "8989"
 }
 
 torrent.mydomain.com {
-  import custom_log
   import internal_routing "qbittorrent" "8080"
 }

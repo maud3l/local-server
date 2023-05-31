@@ -3,7 +3,6 @@ FROM caddy:${CADDY_VERSION}-builder AS builder
 
 RUN xcaddy build \
   --with github.com/lucaslorentz/caddy-docker-proxy/v2 \
-  --with github.com/caddyserver/transform-encoder \
   --with github.com/greenpau/caddy-security
 
 FROM caddy:${CADDY_VERSION}-alpine

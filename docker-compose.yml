@@ -63,7 +63,6 @@ services:
       caddy: adguard.local.xyz
       caddy.reverse_proxy: "{{upstreams 80}}"
       caddy.tls: "internal"
-      caddy.import: custom_log
     ports:
       - 53:53/tcp
       - 53:53/udp
@@ -113,7 +112,6 @@ services:
       caddy: emby.local.xyz
       caddy.reverse_proxy: "{{upstreams 8096}}"
       caddy.tls: "internal"
-      caddy.import: custom_log
     volumes:
       - /home/server/.config/emby/:/config
       - /home/server/ext/tv/:/multimedia/tv
@@ -134,7 +132,6 @@ services:
       caddy: prowlarr.local.xyz
       caddy.reverse_proxy: "{{upstreams 9696}}"
       caddy.tls: "internal"
-      caddy.import: custom_log
     restart: unless-stopped
 
   radarr:
@@ -154,7 +151,6 @@ services:
       caddy: radarr.local.xyz
       caddy.reverse_proxy: "{{upstreams 7878}}"
       caddy.tls: "internal"
-      caddy.import: custom_log
     restart: unless-stopped
 
   sonarr:
@@ -174,7 +170,6 @@ services:
       caddy: sonarr.local.xyz
       caddy.reverse_proxy: "{{upstreams 8989}}"
       caddy.tls: "internal"
-      caddy.import: custom_log
     restart: unless-stopped
 
   bazarr:
@@ -194,7 +189,6 @@ services:
       caddy: bazarr.local.xyz
       caddy.reverse_proxy: "{{upstreams 6767}}"
       caddy.tls: "internal"
-      caddy.import: custom_log
     restart: unless-stopped
 
   ombi:
@@ -207,12 +201,30 @@ services:
     networks:
       - caddy
     labels:
-      caddy: http://ombi.local.xyz
+      caddy: ombi.local.xyz
       caddy.reverse_proxy: "{{upstreams 3579}}"
-      caddy.import: custom_log
+      caddy.tls: "internal"
     volumes:
       - /home/server/.config/ombi/:/config
     restart: unless-stopped
+
+  filebrowser:
+    image: hurlenko/filebrowser
+    container_name: filebrowser
+    networks:
+      - caddy
+    labels:
+      caddy: fb.local.xyz
+      caddy.reverse_proxy: "{{upstreams 8080}}"
+      caddy.tls: "internal"
+    volumes:
+      - ~:/data
+      - ~/.config/filebrowser:/config
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Madrid
+    restart: always
 
   ################################################
   ### DOWNLOADS
@@ -232,7 +244,6 @@ services:
       caddy: torrent.local.xyz
       caddy.reverse_proxy: "{{upstreams 8080}}"
       caddy.tls: "internal"
-      caddy.import: custom_log
     volumes:
       - /home/server/.config/qbittorrent/:/config
       - /home/server/ext/downloads_tv:/multimedia/downloads_tv

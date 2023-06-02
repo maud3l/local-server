@@ -275,6 +275,57 @@ services:
       - "/dev/sda"
       - "/dev/sdb"
 
+  loki:
+    image: grafana/loki:2.8.0
+    container_name: loki
+    networks:
+      - caddy
+    labels:
+      caddy: loki.local.xyz
+      caddy.reverse_proxy: "{{upstreams 3100}}"
+      caddy.tls: "internal"
+    volumes:
+      - ~/git/local-server/loki/loki-config.yaml:/etc/loki/loki-config.yaml
+      - ~/.config/loki/data:/data/loki
+    command: -config.file=/etc/loki/loki-config.yaml
+
+  promtail:
+    build:
+      context: ./promtail
+      dockerfile: Dockerfile
+    container_name: promtail
+    restart: unless-stopped
+    networks:
+      - caddy
+    volumes:
+      - caddy_access_log:/var/log/caddy
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    environment:
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel,grafana-worldmap-panel
+      - GF_PANELS_DISABLE_SANITIZE_HTML=true
+    volumes:
+      - ~/git/local-server/grafana/provisioning:/etc/grafana/provisioning
+      - ~/.config/grafana/data:/var/lib/grafana
+    networks:
+      - caddy
+
+  prometheus:
+    image: prom/prometheus:v2.36.2
+    container_name: prometheus
+    volumes:
+      - ~/git/local-server/prometheus:/etc/prometheus
+      - ~/.config/prometheus:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+    networks:
+      - caddy
+
   ################################################
   ### HOME
   ################################################

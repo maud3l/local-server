@@ -1,3 +1,14 @@
+{
+  admin 0.0.0.0:2019
+  servers {
+    metrics
+  }
+  log {
+    format json
+    output file /var/log/caddy/CaddyAccess.json
+  }
+}
+
 (internal_routing) {
   @internal {
     remote_ip 192.168.0.0/16 172.0.0.0/8 10.0.0.0/8
@@ -6,13 +17,6 @@
     reverse_proxy {args.0}:{args.1}
   }
   respond 403
-}
-
-(jail2ban_log) {
-  log {
-    format json
-    output file /var/log/caddy/CaddyAccess.json
-  }
 }
 
 {
@@ -67,13 +71,16 @@ vpn.mydomain.com {
   }
 }
 
+metrics.mydomain.com {
+  import internal_routing "grafana" "3000"
+}
+
+
 emby.mydomain.com {
-    import jail2ban_log
     reverse_proxy emby:8096
 }
 
 ombi.mydomain.com {
-  import jail2ban_log
   reverse_proxy ombi:3579
 }
 

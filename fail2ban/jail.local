@@ -30,3 +30,4 @@ mode = normal
 filter = %(__name__)s[mode=%(mode)s]
 banaction = route
 action = %(banaction)s[blocktype=blackhole]
+         telegram

@@ -274,6 +274,23 @@ services:
     devices:
       - "/dev/sda"
       - "/dev/sdb"
+
+  ################################################
+  ### HOME
+  ################################################
+
+  homebridge:
+    image: oznu/homebridge:latest
+    restart: always
+    network_mode: host
+    volumes:
+      - ~/.config/homebridge:/homebridge
+    logging:
+      driver: json-file
+      options:
+        max-size: "10mb"
+        max-file: "1"
+
 networks:
   caddy:
     external: true

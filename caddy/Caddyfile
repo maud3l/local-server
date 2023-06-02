@@ -92,3 +92,9 @@ sonarr.mydomain.com {
 torrent.mydomain.com {
   import internal_routing "qbittorrent" "8080"
 }
+
+homebridge.local.xyz {
+  tls internal
+  reverse_proxy 192.168.50.130:8581
+}
+
